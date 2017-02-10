@@ -411,7 +411,7 @@ class pyredictit:
         return contracts
 
     def trigger_stop_loss(self, contract, number_of_shares, trigger_price):
-        contract.sell(api=self, number_of_shares=number_of_shares, sell_price=trigger_price)
+        contract.sell_shares(api=self, number_of_shares=number_of_shares, sell_price=trigger_price)
 
     def monitor_price_of_contract(self, contract, trigger_price, monitor_type, number_of_shares=None):
         """
@@ -424,12 +424,12 @@ class pyredictit:
         contract.update()
         if monitor_type == 'stop_loss':
             if floatify(contract.latest) <= trigger_price:
-                contract.sell(api=self, number_of_shares=number_of_shares, sell_price=trigger_price)
+                contract.sell_shares(api=self, number_of_shares=number_of_shares, sell_price=trigger_price)
             else:
                 print(f'Your sell price is {trigger_price}. The current price is {floatify(contract.latest)}')
         elif monitor_type == 'buy_at':
             if floatify(contract.latest) <= trigger_price:
-                contract.buy(api=self, number_of_shares=number_of_shares, sell_price=trigger_price)
+                contract.buy_shares(api=self, number_of_shares=number_of_shares, sell_price=trigger_price)
             else:
                 print(f'Your buy in price is {trigger_price}. The current price is {floatify(contract.latest)}')
         elif monitor_type == 'generic':
