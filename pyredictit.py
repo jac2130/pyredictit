@@ -146,18 +146,20 @@ class Contract:
             elif 'You do not have sufficient funds to make this offer' in str(r.content):
                 print('You do not have sufficient funds to make this offer!')
             elif 'There was a problem creating your offer':
+                print(f"DEBUGGING INFO - INCLUDE IN GITHUB ISSUE: {r.content}")
                 print('There was a problem creating the offer. Check to make sure that you don\'t have any \'yes\' contracts that would prevent you from buying \'no\'s or vice versa.')
             else:
-                print(r.content)
+                print(f"DEBUGGING INFO - INCLUDE IN GITHUB ISSUE: {r.content}")
         else:
             print(f"Request returned an invalid {r.status_code} code. Please make sure you're using valid login credentials.")
 
 
     def sell_shares(self, api, number_of_shares, sell_price):
         if self.type_.lower() == 'no':
-            type_, id_ = 'Short', '0'
+            type_, id_ = 'Short', '2'
         elif self.type_.lower() == 'yes':
-            type_, id_ = 'Long', '1'
+            type_, id_ = 'Long', '3'
+        print((f'https://www.predictit.org/Trade/LoadSell{type_}?contractId={self.cid}'))
         load_side_page = api.browser.get(f'https://www.predictit.org/Trade/LoadSell{type_}?contractId={self.cid}')
         token = load_side_page.soup.find('input', attrs={'name': '__RequestVerificationToken'}).get('value')
         r = api.browser.post('https://www.predictit.org/Trade/SubmitTrade',
@@ -169,10 +171,12 @@ class Contract:
                               'X-Requested-With': 'XMLHttpRequest'})
         if str(r.status_code) == '200':
             if 'Confirmation Pending' in str(r.content):
-                print('Purchase offer successful!')
+                print('Sell offer successful!')
             elif 'There was a problem creating your offer':
+                print(f"DEBUGGING INFO - INCLUDE IN GITHUB ISSUE: {r.content}")
                 print('There was a problem creating the offer. Check to make sure that you don\'t have any \'yes\' contracts that would prevent you from buying \'no\'s or vice versa.')
             else:
+                print(f"DEBUGGING INFO - INCLUDE IN GITHUB ISSUE: {r.content}")
                 print(r.content)
         else:
             print(f"Request returned an invalid {r.status_code} code. Please make sure you're using valid login credentials.")
@@ -429,7 +433,7 @@ class pyredictit:
                 print(f'Your sell price is {trigger_price}. The current price is {floatify(contract.latest)}')
         elif monitor_type == 'buy_at':
             if floatify(contract.latest) <= trigger_price:
-                contract.buy_shares(api=self, number_of_shares=number_of_shares, sell_price=trigger_price)
+                contract.buy_shares(api=self, number_of_shares=number_of_shares, buy_price=trigger_price)
             else:
                 print(f'Your buy in price is {trigger_price}. The current price is {floatify(contract.latest)}')
         elif monitor_type == 'generic':
