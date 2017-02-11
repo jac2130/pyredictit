@@ -37,7 +37,7 @@ class Contract:
             self.name = type_.title()
         self.type_ = type_
         self.number_of_shares = int(shares)
-        self.avg_price = avg_price
+        self.avg_price = avg_price.strip('¢')
         self.buy_offers = buy_offers
         self.sell_offers = sell_offers
         self.gain_loss = gain_loss
@@ -45,7 +45,7 @@ class Contract:
             self.gain_loss = gain_loss.replace('(', '-').replace(')', '')
         self.latest = latest
         self.buy = buy
-        self.sell = sell
+        self.sell = sell.strip('¢')
         self.ticker = ticker
         self.latest_volume = None
 
