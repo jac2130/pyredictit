@@ -219,10 +219,10 @@ class pyredictit:
         )
 
     def update_balances(self):
-        my_shares_page = self.browser.get('https://www.predictit.org/Profile/MyShares')
-        self.available = my_shares_page.soup.find("span", class_="SPBalance").text
-        self.gain_loss = my_shares_page.soup.find("span", class_='SPShares').text
-        self.invested = my_shares_page.soup.find("span", class_="SPPortfolio").text
+        user_funds = self.browser.get('https://www.predictit.org/PrivateData/_UserFundsMainNav').json()
+        self.available = user_funds['BalanceText']
+        self.gain_loss = user_funds['SharesText']
+        self.invested = user_funds['PortfolioText']
 
     def money_available(self):
         self.update_balances()
