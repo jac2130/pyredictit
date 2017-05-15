@@ -1,10 +1,15 @@
-from pyredictit.pyredictit import pyredictit
+from pyredictit import pyredictit
+import sys, os
+sys.path.append(os.path.abspath("../../vars"))
+from env_vars import *
 
 pyredictit_api = pyredictit()
-pyredictit_api.create_authed_session(username='YOUR_USERNAME',
-                                     password='YOUR_PASSWORD')
+pyredictit_api.create_authed_session(username=user_name,password=password)
+
+
 pyredictit_api.list_my_contracts()
 
+"""
 >>> ------
 >>> 2017-01-25 19:15:24.276645
 >>> Will Raymond Kethledge be the next confirmed Supreme Court justice?
@@ -18,4 +23,4 @@ pyredictit_api.list_my_contracts()
 >>> The implied odds of this contract resolving to Yes are 8%
 >>> If this contract resolves to Yes, you would earn $1.01. Otherwise, you would lose $-0.11}
 ------
-
+"""
