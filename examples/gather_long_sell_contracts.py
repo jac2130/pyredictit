@@ -1,14 +1,17 @@
-from pyredictit.pyredictit import pyredictit
+from pyredictit import pyredictit
+import sys, os
+sys.path.append(os.path.abspath("../../vars"))
+from env_vars import *
 
 pyredictit_api = pyredictit()
-pyredictit_api.create_authed_session(username='YOUR_USERNAME',
-                                     password='YOUR_PASSWORD')
+pyredictit_api.create_authed_session(username=user_name,password=password)
 long_sell_contracts = pyredictit_api.search_for_contracts(market='politics', buy_sell='sell', type_='long')
 for contract in long_sell_contracts:
     print('------')
     print(contract.market)
     print(contract.name)
-
+    
+"""
 >>> ------
 >>> Will a federal minimum wage increase go into effect by year-end 2017?
 >>> Long
@@ -28,3 +31,4 @@ for contract in long_sell_contracts:
 >>> Will the ACA employer mandate be repealed by the end of 2017?
 >>> Long
 >>> .....
+"""
