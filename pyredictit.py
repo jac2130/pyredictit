@@ -1,3 +1,4 @@
+import json
 import ast
 import datetime
 from time import sleep
@@ -348,7 +349,7 @@ class pyredictit:
             print('You don\'t have any active contracts!')
             return
 
-    def search_for_contracts(self, market, buy_sell, type_, contracts=None):
+    def search_for_contracts(self, market=None, buy_sell=None, type_=None, contracts="All"):
         """
         Search for contracts that aren't currently owned and add them to
         the contracts list, which is created if it isn't supplied.
@@ -360,7 +361,9 @@ class pyredictit:
         """
         if not contracts:
             contracts = []
-        if type_.lower() in ['yes', 'long'] and buy_sell == 'buy':
+        if not type_:
+            pass
+        elif type_.lower() in ['yes', 'long'] and buy_sell == 'buy':
             type_ = {'long': 'BestBuyYesCost'}
         elif type_.lower() in ['no', 'short'] and buy_sell == 'buy':
             type_ = {'short': 'BestBuyNoCost'}
@@ -368,17 +371,31 @@ class pyredictit:
             type_ = {'long': 'BestSellYesCost'}
         elif type_.lower() in ['no', 'short'] and buy_sell == 'sell':
             type_ = {'short': 'BestSellNoCost'}
-        if 'us' and 'election' in market.replace('.', '').lower():
-            market_link = 'https://www.predictit.org/api/marketdata/category/6'
+            
+        if not market:
+            market_links = ['https://www.predictit.org/api/marketdata/category/6', 'https://www.predictit.org/api/marketdata/category/13', 'https://www.predictit.org/api/marketdata/category/4']
+        elif 'us' and 'election' in market.replace('.', '').lower():
+            market_links = ['https://www.predictit.org/api/marketdata/category/6']
         elif 'us' and 'politic' in market.replace('.', '').lower():
-            market_link = 'https://www.predictit.org/api/marketdata/category/13'
+            market_links = ['https://www.predictit.org/api/marketdata/category/13']
         elif 'world' in market.lower():
-            market_link = 'https://www.predictit.org/api/marketdata/category/4'
-        else:
-            print('Invalid market selected.')
-            return
-        raw_market_data = self.browser.get(market_link).json()['Markets']
+            market_links = ['https://www.predictit.org/api/marketdata/category/4']
+        
+           
+
+        raw_market_data=[]
+        for market_link in market_links:
+            raw_market_data.extend(list(self.browser.get(market_link).json()['Markets']))
+            
+        market_data=[]
         for market in raw_market_data:
+            market_data.append(json.dumps(market))
+            
+        return market_data
+
+    #for now, I'm not filtering by "long" or "short" or by "buy" or "sell"
+    
+    """
             for contract in market['Contracts']:
                 if list(type_.keys())[0].title() == 'Long' and buy_sell == 'sell':
                     new_contract = Contract(type_='long', sell=contract[list(type_.values())[0]], buy='0.00',
@@ -413,7 +430,7 @@ class pyredictit:
                                             )
                     contracts.append(new_contract)
         return contracts
-
+    """
     def trigger_stop_loss(self, contract, number_of_shares, trigger_price):
         contract.sell_shares(api=self, number_of_shares=number_of_shares, sell_price=trigger_price)
 

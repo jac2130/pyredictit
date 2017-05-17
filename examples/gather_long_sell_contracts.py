@@ -6,8 +6,11 @@ from env_vars import *
 
 pyredictit_api = pyredictit()
 pyredictit_api.create_authed_session(username=user_name,password=password)
-long_sell_contracts = pyredictit_api.search_for_contracts(market='politics', buy_sell='sell', type_='long')
-
+contracts = pyredictit_api.search_for_contracts()
+for contract in contracts:
+    print(contract)
+    print("\n\n\n")
+"""
 out = {}
 for contract in long_sell_contracts:
     #print('------')
@@ -30,3 +33,4 @@ for contract in long_sell_contracts:
         
 with open("bets.json", "w") as f:
     f.write(json.dumps(out))        
+"""
