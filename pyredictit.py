@@ -373,24 +373,24 @@ class pyredictit:
             type_ = {'short': 'BestSellNoCost'}
             
         if not market:
-            market_links = ['https://www.predictit.org/api/marketdata/category/6', 'https://www.predictit.org/api/marketdata/category/13', 'https://www.predictit.org/api/marketdata/category/4']
+            market_links = [("us_election", 'https://www.predictit.org/api/marketdata/category/6'), ("us_politics", 'https://www.predictit.org/api/marketdata/category/13'), ("world_politics", 'https://www.predictit.org/api/marketdata/category/4')]
         elif 'us' and 'election' in market.replace('.', '').lower():
-            market_links = ['https://www.predictit.org/api/marketdata/category/6']
+            market_links = [("us_elections", 'https://www.predictit.org/api/marketdata/category/6')]
         elif 'us' and 'politic' in market.replace('.', '').lower():
-            market_links = ['https://www.predictit.org/api/marketdata/category/13']
+            market_links = [("us_politics",'https://www.predictit.org/api/marketdata/category/13')]
         elif 'world' in market.lower():
-            market_links = ['https://www.predictit.org/api/marketdata/category/4']
+            market_links = [("world_politics", 'https://www.predictit.org/api/marketdata/category/4')]
         
            
 
-        raw_market_data=[]
-        for market_link in market_links:
-            raw_market_data.extend(list(self.browser.get(market_link).json()['Markets']))
-            
         market_data=[]
-        for market in raw_market_data:
-            market_data.append(json.dumps(market))
-            
+        for category, market_link in market_links:
+            markets = list(self.browser.get(market_link).json()['Markets'])
+            for market in markets:
+                market = market
+                market["Category"] = category
+                market_data.append(json.dumps(market))
+                
         return market_data
 
     #for now, I'm not filtering by "long" or "short" or by "buy" or "sell"
