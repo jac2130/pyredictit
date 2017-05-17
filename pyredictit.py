@@ -389,6 +389,10 @@ class pyredictit:
             for market in markets:
                 market = market
                 market["Category"] = category
+                market["Refferences"]=[]
+                for thing in ["Trump", "Clinton", "Ossoff", "Virginia", "Georgia","Election"]:
+                    if thing.lower() in [element.lower() for element in market["Name"].split()]:
+                        market["Refferences"].append(thing)
                 market_data.append(json.dumps(market))
                 
         return market_data
