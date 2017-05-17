@@ -390,9 +390,11 @@ class pyredictit:
                 market = market
                 market["Category"] = category
                 market["Refferences"]=[]
+                wikidict={"Trump": "https://en.wikipedia.org/wiki/Donald_Trump", "Clinton": "https://en.wikipedia.org/wiki/Hillary_Clinton", "Ossoff": "https://en.wikipedia.org/wiki/Jon_Ossoff", "Virginia": "https://en.wikipedia.org/wiki/Virginia", "Georgia": "https://en.wikipedia.org/wiki/Georgia_(U.S._state)","Election":"https://en.wikipedia.org/wiki/Elections_in_the_United_States"}
+                
                 for thing in ["Trump", "Clinton", "Ossoff", "Virginia", "Georgia","Election"]:
                     if thing.lower() in [element.lower() for element in market["Name"].split()]:
-                        market["Refferences"].append(thing)
+                        market["Refferences"].append(wikidict[thing])
                 market_data.append(json.dumps(market))
                 
         return market_data
