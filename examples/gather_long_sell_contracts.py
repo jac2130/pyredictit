@@ -17,6 +17,7 @@ for contract in contracts:
     
     try:
         cont=json.loads(contract)
+        print(cont.keys())
         out.append(cont["Name"])
     except UnicodeEncodeError:
         pass
