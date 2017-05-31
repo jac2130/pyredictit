@@ -5,7 +5,8 @@ from time import sleep
 from urllib.request import urlopen
 import mechanicalsoup
 import re
-
+import sys
+sys.path.append("/usr/local/lib/python2.7/dist-packages")
 
 def chunks(l, n):
     for i in range(0, len(l), n):
@@ -18,7 +19,7 @@ def floatify(string):
     :param string: str
     :return:
     """
-    temporary_string = f"0.{string[:-1]}"
+    temporary_string = "0." + string[:-1]
     return float(temporary_string)
 
 
@@ -53,52 +54,52 @@ class Contract:
     @property
     def shares(self):
         if self.number_of_shares == 1:
-            return f"You have {self.number_of_shares} {self.type_} share."
+            return "You have " + str(self.number_of_shares) + str(self.type_) + " share."
         else:
-            return f"You have {self.number_of_shares} {self.type_} shares."
+            return "You have " + str(self.number_of_shares) + str(self.type_) + " shares."
 
     @property
     def average_price(self):
-        return f"Your average purchase price of {self.type_} shares is {self.avg_price}"
+        return "Your average purchase price of " + str(self.type_) + " shares is " + str(self.avg_price)
 
     @property
     def gain_or_loss(self):
         if '+' in self.gain_loss:
-            return f"Your shares have gained {self.gain_loss} in value."
+            return "Your shares have gained " + str(self.gain_loss) + " in value."
         else:
-            return f"Your shares have lost {self.gain_loss} in value."
+            return "Your shares have lost "  + str(self.gain_loss) + " in value."
 
     @property
     def sell_price(self):
-        return f"{self.type_} shares are currently being bought for {self.sell}"
+        return str(self.type_) + " shares are currently being bought for " + str(self.sell)
 
     @property
     def buy_price(self):
-        return f"{self.type_} shares are currently being sold at {self.buy}"
+        return str(self.type_) + " shares are currently being sold at " + str(self.buy)
 
     @property
     def estimate_sale_of_current_shares(self):
         try:
             if float(self.sell[:-1]) - float(self.avg_price[:-1]) > 0:
-                return f"If you sold all of your shares now, you would earn ${str(float(float(self.sell[:-1]) - float(self.avg_price[:-1])) * self.number_of_shares * 0.01)}"
+                return "If you sold all of your shares now, you would earn $" + str(float(float(self.sell[:-1]) - float(self.avg_price[:-1])) * self.number_of_shares * 0.01)
             else:
-                return f"If you sold all of your shares now, you would lose ${str(float(float(self.sell[:-1]) - float(self.avg_price[:-1])) * self.number_of_shares * 0.01 + (float(self.number_of_shares) * float(self.avg_price[:-1])) * 0.01)}"
+                return "If you sold all of your shares now, you would lose $"+ str(float(float(self.sell[:-1]) - float(self.avg_price[:-1])) * self.number_of_shares * 0.01 + (float(self.number_of_shares) * float(self.avg_price[:-1])) * 0.01)
         except ValueError as e:
             return e
 
     @property
     def estimate_best_result(self):
-        return f"If this contract resolves to {self.type_}, you would earn ${1 - (float(self.avg_price[:1])) * self.number_of_shares * 0.01 * -1}. Otherwise, you would lose ${float(self.avg_price[:1]) * self.number_of_shares * 0.01 * -1 - (float(self.number_of_shares) * float(self.avg_price[:-1])) * 0.01}}}"
+        return "If this contract resolves to " + str(self.type_) + "you would earn $" + str(1 - (float(self.avg_price[:1])) * self.number_of_shares * 0.01 * -1) + ". Otherwise, you would lose $" + str(float(self.avg_price[:1]) * self.number_of_shares * 0.01 * -1 - (float(self.number_of_shares) * float(self.avg_price[:-1])) * 0.01)
 
     @property
     def implied_odds(self):
         """Implied odds of a contract are what a given resolution
          in a market is being bought for currently."""
-        return f"The implied odds of this contract resolving to {self.type_} are {self.buy.replace('¢', '%')}"
+        return "The implied odds of this contract resolving to " + str(self.type_) + " are " + str(self.buy.replace('¢', '%'))
 
     @property
     def volume(self):
-        return f"There have been {self.latest_volume} shares traded today."
+        return "There have been " + str(self.latest_volume) + " shares traded today."
 
     def summary(self):
         print('----')
@@ -121,7 +122,7 @@ class Contract:
         """
         latest_data = ast.literal_eval(
             urlopen(
-                f'https://www.predictit.org/PublicData/GetChartData?contractIds={self.cid}&timespan=24H').read().decode(
+                'https://www.predictit.org/PublicData/GetChartData?contractIds=' + str(self.cid) + '&timespan=24H').read().decode(
                 'utf-8').replace(
                 'false', 'False').replace('true', 'True').replace('null', 'None'))[-1]
         self.latest_volume = latest_data['TradeVolume']
@@ -132,14 +133,14 @@ class Contract:
             type_, id_ = 'Short', '0'
         elif self.type_.lower() == 'yes' or 'long':
             type_, id_ = 'Long', '1'
-        load_side_page = api.browser.get(f'https://www.predictit.org/Trade/LoadBuy{type_}?contractId={self.cid}')
+        load_side_page = api.browser.get('https://www.predictit.org/Trade/LoadBuy'+ str(type_)+'?contractId=' + str(self.cid))
         token = load_side_page.soup.find('input', attrs={'name': '__RequestVerificationToken'}).get('value')
         r = api.browser.post('https://www.predictit.org/Trade/SubmitTrade',
                              {'__RequestVerificationToken': token,
                               'BuySellViewModel.ContractId': self.cid,
                               'BuySellViewModel.TradeType': id_,
                               'BuySellViewModel.Quantity': number_of_shares,
-                              'BuySellViewModel.PricePerShare': f'{float(buy_price)}',
+                              'BuySellViewModel.PricePerShare': str(float(buy_price)),
                               'X-Requested-With': 'XMLHttpRequest'})
         if str(r.status_code) == '200':
             if 'Confirmation Pending' in str(r.content):
@@ -147,12 +148,12 @@ class Contract:
             elif 'You do not have sufficient funds to make this offer' in str(r.content):
                 print('You do not have sufficient funds to make this offer!')
             elif 'There was a problem creating your offer':
-                print(f"DEBUGGING INFO - INCLUDE IN GITHUB ISSUE: {r.content}")
+                print("DEBUGGING INFO - INCLUDE IN GITHUB ISSUE: " + str(r.content))
                 print('There was a problem creating the offer. Check to make sure that you don\'t have any \'yes\' contracts that would prevent you from buying \'no\'s or vice versa.')
             else:
-                print(f"DEBUGGING INFO - INCLUDE IN GITHUB ISSUE: {r.content}")
+                print("DEBUGGING INFO - INCLUDE IN GITHUB ISSUE: "+ str(r.content))
         else:
-            print(f"Request returned an invalid {r.status_code} code. Please make sure you're using valid login credentials.")
+            print("Request returned an invalid " + str(r.status_code)+ " code. Please make sure you're using valid login credentials.")
 
 
     def sell_shares(self, api, number_of_shares, sell_price):
@@ -160,32 +161,32 @@ class Contract:
             type_, id_ = 'Short', '2'
         elif self.type_.lower() == 'yes':
             type_, id_ = 'Long', '3'
-        print((f'https://www.predictit.org/Trade/LoadSell{type_}?contractId={self.cid}'))
-        load_side_page = api.browser.get(f'https://www.predictit.org/Trade/LoadSell{type_}?contractId={self.cid}')
+        print(('https://www.predictit.org/Trade/LoadSell' + str(type_)+ '?contractId='+ str(self.cid)))
+        load_side_page = api.browser.get('https://www.predictit.org/Trade/LoadSell' + str(type_)+ '?contractId=' + str(self.cid))
         token = load_side_page.soup.find('input', attrs={'name': '__RequestVerificationToken'}).get('value')
         r = api.browser.post('https://www.predictit.org/Trade/SubmitTrade',
                              {'__RequestVerificationToken': token,
                               'BuySellViewModel.ContractId': self.cid,
                               'BuySellViewModel.TradeType': id_,
                               'BuySellViewModel.Quantity': number_of_shares,
-                              'BuySellViewModel.PricePerShare': f'{float(sell_price)}',
+                              'BuySellViewModel.PricePerShare': str(float(sell_price)),
                               'X-Requested-With': 'XMLHttpRequest'})
         if str(r.status_code) == '200':
             if 'Confirmation Pending' in str(r.content):
                 print('Sell offer successful!')
             elif 'There was a problem creating your offer':
-                print(f"DEBUGGING INFO - INCLUDE IN GITHUB ISSUE: {r.content}")
+                print("DEBUGGING INFO - INCLUDE IN GITHUB ISSUE: " + str(r.content))
                 print('There was a problem creating the offer. Check to make sure that you don\'t have any \'yes\' contracts that would prevent you from buying \'no\'s or vice versa.')
             else:
-                print(f"DEBUGGING INFO - INCLUDE IN GITHUB ISSUE: {r.content}")
+                print("DEBUGGING INFO - INCLUDE IN GITHUB ISSUE: " + str(r.content))
                 print(r.content)
         else:
-            print(f"Request returned an invalid {r.status_code} code. Please make sure you're using valid login credentials.")
+            print("Request returned an invalid " + str(r.status_code) + " code. Please make sure you're using valid login credentials.")
 
     def update(self):
         r = ast.literal_eval(
             urlopen(
-                f'https://www.predictit.org/api/marketdata/ticker/{self.ticker}').read().decode(
+                'https://www.predictit.org/api/marketdata/ticker/'+str(self.ticker)).read().decode(
                 'utf-8').replace(
                 'false', 'False').replace('true', 'True').replace('null', 'None'))
         for contract in r['Contracts']:
@@ -200,7 +201,7 @@ class Contract:
                     self.sell = contract['BestSellNoCost']
 
     def __str__(self):
-        return f"{self.market}, {self.name}, {self.type_}, {self.shares}, {self.average_price}, {self.buy_offers},{self.sell_offers}, {self.gain_loss}, {self.latest}, {self.buy}, {self.sell}"
+        return str(self.market), str(self.name), str(self.type_), str(self.shares), str(self.average_price), str(self.buy_offers), str(self.sell_offers), str(self.gain_loss), str(self.latest), str(self.buy), str(self.sell)
 
 
 class pyredictit:
@@ -227,18 +228,18 @@ class pyredictit:
 
     def money_available(self):
         self.update_balances()
-        print(f"You have {self.available} available.")
+        print("You have " + str(self.available) + " available.")
 
     def current_gain_loss(self):
         self.update_balances()
         if '-' in self.gain_loss:
-            print(f"You've lost {self.gain_loss[1:]}.")
+            print("You've lost " + str(self.gain_loss[1:]) + ".")
         else:
-            print(f"You've gained {self.gain_loss[1:]}.")
+            print("You've gained " + str(self.gain_loss[1:]) + ".")
 
     def money_invested(self):
         self.update_balances()
-        print(f"You have {self.invested} currently invested in contracts.")
+        print("You have " + str(self.invested) + " currently invested in contracts.")
 
     def create_authed_session(self, username, password):
         """
@@ -279,7 +280,7 @@ class pyredictit:
                     except AttributeError:
                         pass
                     parsed_market_data.append(string)
-                for line in urlopen(f'https://www.predictit.org/Contract/{cid}/#data').read().splitlines():
+                for line in urlopen('https://www.predictit.org/Contract/'+ str(cid) + '/#data').read().splitlines():
                     if 'ChartTicker' in str(line):
                         ticker = re.search(pattern="= '(.*)';", string=str(line)).group(1)
                         break
@@ -453,12 +454,12 @@ class pyredictit:
             if floatify(contract.latest) <= trigger_price:
                 contract.sell_shares(api=self, number_of_shares=number_of_shares, sell_price=trigger_price)
             else:
-                print(f'Your sell price is {trigger_price}. The current price is {floatify(contract.latest)}')
+                print('Your sell price is ' + str(trigger_price) + '. The current price is ' + str(floatify(contract.latest)))
         elif monitor_type == 'buy_at':
             if floatify(contract.latest) <= trigger_price:
                 contract.buy_shares(api=self, number_of_shares=number_of_shares, buy_price=trigger_price)
             else:
-                print(f'Your buy in price is {trigger_price}. The current price is {floatify(contract.latest)}')
+                print('Your buy in price is ' + str(trigger_price) + '. The current price is ' + str(floatify(contract.latest)))
         elif monitor_type == 'generic':
             print(contract.latest)
 
