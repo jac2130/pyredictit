@@ -1,23 +1,27 @@
 from pyredictit import pyredictit
 import json
 import sys, os
-sys.path.append(os.path.abspath("../../vars"))
+sys.path.append(os.path.abspath("../../"))
 from env_vars import *
 
 pyredictit_api = pyredictit()
 pyredictit_api.create_authed_session(username=user_name,password=password)
 contracts = pyredictit_api.search_for_contracts()
+
+non = None     
+
+out = []
 for contract in contracts:
-    print(contract)
-    print("\n\n\n")
-"""
-out = {}
-for contract in long_sell_contracts:
     #print('------')
     #for item in dir(contract):
     
-    cont=contract.__dict__    
-    market= cont["market"]
+    try:
+        cont=json.loads(contract)
+        out.append(cont["Name"])
+    except UnicodeEncodeError:
+        pass
+    """
+    market= cont["Name"]
     if not market in out.keys():
         out[market]={}
         out[market]["outcomes"]={}
@@ -30,7 +34,9 @@ for contract in long_sell_contracts:
         
     for key in list(set(cont.keys())- set(["name", "market", "cid"])):
         out[market]["outcomes"][cont["cid"]][key]=str(cont[key])
-        
+    """
+    
+    
 with open("bets.json", "w") as f:
     f.write(json.dumps(out))        
-"""
+
