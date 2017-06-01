@@ -2,7 +2,7 @@ import json
 import ast
 import datetime
 from time import sleep
-from urllib.request import urlopen
+from urllib import urlopen
 import mechanicalsoup
 import re
 import sys
@@ -91,11 +91,6 @@ class Contract:
     def estimate_best_result(self):
         return "If this contract resolves to " + str(self.type_) + "you would earn $" + str(1 - (float(self.avg_price[:1])) * self.number_of_shares * 0.01 * -1) + ". Otherwise, you would lose $" + str(float(self.avg_price[:1]) * self.number_of_shares * 0.01 * -1 - (float(self.number_of_shares) * float(self.avg_price[:-1])) * 0.01)
 
-    @property
-    def implied_odds(self):
-        """Implied odds of a contract are what a given resolution
-         in a market is being bought for currently."""
-        return "The implied odds of this contract resolving to " + str(self.type_) + " are " + str(self.buy.replace('¢', '%'))
 
     @property
     def volume(self):
