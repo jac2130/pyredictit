@@ -1,8 +1,10 @@
+#!/usr/local/bin/python
+# -*- coding: utf-8 -*-
 import json
 import ast
 import datetime
 from time import sleep
-from urllib.request import urlopen
+from urllib import urlopen
 import mechanicalsoup
 import re
 import sys
